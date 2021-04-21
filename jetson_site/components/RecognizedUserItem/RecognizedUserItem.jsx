@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { Avatar, Collapse, Dialog, IconButton, InputBase, List, ListItem, ListItemAvatar, ListItemIcon, ListItemSecondaryAction, ListItemText } from "@material-ui/core"
-import { ExpandLess, ExpandMore, Add, Delete, Edit, Save } from '@material-ui/icons'
+import { Avatar, Badge, Collapse, Dialog, IconButton, InputBase, List, ListItem, ListItemAvatar, ListItemIcon, ListItemSecondaryAction, ListItemText } from "@material-ui/core"
+import { ExpandLess, ExpandMore, Add, Delete, Edit, Save, Clear } from '@material-ui/icons'
 import { mutate } from 'swr'
 import { useRouter } from 'next/router'
 
@@ -21,7 +21,11 @@ const RecognizedUserItem = ({ user }) => {
         setModal(!modal);
     }
 
-    const handleDeleteUser = async () => {
+    const inputChangeHandler = (e) => {
+        setName(e.target.value);
+    }
+
+    const deleteUserHandler = async () => {
         await fetch('/api/users', {
             method: 'DELETE',
             headers: {
@@ -29,14 +33,15 @@ const RecognizedUserItem = ({ user }) => {
                 'Content-Type': contentType,
             },
             body: JSON.stringify({
-                _id: user._id
+                _id: user._id,
+                imageId: null
             }),
         })
         mutate('/api/users')
         router.push('/dashboard')
     }
 
-    const handleEdit = async () => {
+    const editUserNameHandler = async () => {
         setEdit(!edit)
         if (edit) {
             await fetch('/api/users', {
@@ -55,9 +60,21 @@ const RecognizedUserItem = ({ user }) => {
         router.push('/dashboard')
     }
 
-
-    const handleInputChange = (e) => {
-        setName(e.target.value);
+    const deleteImageHandler = async (e, imageId) => {
+        console.log(imageId)
+        await fetch('/api/users', {
+            method: 'DELETE',
+            headers: {
+                Accept: contentType,
+                'Content-Type': contentType,
+            },
+            body: JSON.stringify({
+                _id: user._id,
+                imageId: imageId
+            }),
+        })
+        mutate('/api/users')
+        router.push('/dashboard')
     }
 
     const avatar = user.images.find((image) => !image.croped)
@@ -67,7 +84,7 @@ const RecognizedUserItem = ({ user }) => {
             <ListItem button>
                 <ListItemIcon>
 
-                    <IconButton edge="end" onClick={handleEdit}>
+                    <IconButton edge="end" onClick={editUserNameHandler}>
                         {edit ? <Save /> : <Edit />}
                     </IconButton>
                 </ListItemIcon>
@@ -80,7 +97,7 @@ const RecognizedUserItem = ({ user }) => {
                 {edit ? <InputBase
                     fullWidth
                     value={name}
-                    onChange={handleInputChange}
+                    onChange={inputChangeHandler}
                 /> :
                     <ListItemText primary={user.name} />}
 
@@ -89,19 +106,28 @@ const RecognizedUserItem = ({ user }) => {
                 </ListItemIcon>
 
                 <ListItemSecondaryAction>
-                    <IconButton onClick={handleDeleteUser}>
+                    <IconButton onClick={deleteUserHandler}>
                         <Delete />
                     </IconButton>
                 </ListItemSecondaryAction>
             </ListItem>
             <Collapse in={modal} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
-                    <ListItem button>
+                    <ListItem button style={{ minHeight: 64 }}>
                         {user.images.map((image) => image.croped && (
                             <ListItemAvatar key={image._id} onClick={(e) => e.target.src && setOpen({ open: true, src: e.target.src })}>
-                                <Avatar
-                                    src={image.url}
-                                />
+                                <Badge
+                                    badgeContent={
+                                        <IconButton onClick={(e) => deleteImageHandler(e, image._id)} aria-label="delete" size="small">
+                                            <Clear fontSize="inherit" />
+                                        </IconButton>
+                                    }
+                                >
+                                    <Avatar
+                                        src={image.url}
+                                    />
+                                </Badge>
+
                             </ListItemAvatar>
                         ))}
                     </ListItem>

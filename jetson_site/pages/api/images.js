@@ -18,6 +18,17 @@ export default async function handler(req, res) {
                 res.status(400).json({ success: false })
             }
             break
+        case 'DELETE':
+            try {
+                const images = await Image.deleteMany({ user: null })
+
+                if (!images) return res.status(400).json({ success: false })
+
+                res.status(200).json({ success: true, data: {} })
+            } catch (error) {
+                res.status(400).json({ success: false })
+            }
+            break
         default:
             res.status(400).json({ success: false })
             break

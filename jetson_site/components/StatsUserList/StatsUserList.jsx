@@ -19,6 +19,7 @@ const StatsUserList = () => {
     if (!stats) return <LinearProgress color="secondary" />
 
     const clearHistoryHandler = async () => {
+        if (stats.length === 0) return
         await fetch('/api/stats', {
             method: 'DELETE',
             headers: {

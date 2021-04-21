@@ -41,12 +41,25 @@ export default async function handler(req, res) {
             break
         case 'DELETE':
             try {
-                const deleteUser = await User.findByIdAndRemove(req.body).populate('images')
-                if (!deleteUser) return res.status(400).json({ success: false })
+                const { _id, imageId } = req.body
 
-                deleteUser.images.map(async (image) => {
-                    await Image.findByIdAndRemove(image._id)
-                })
+                if (!imageId) {
+                    const deleteUser = await User.findByIdAndRemove({ _id }).populate('images')
+                    if (!deleteUser) return res.status(400).json({ success: false })
+
+                    deleteUser.images.map(async (image) => {
+                        await Image.findByIdAndRemove(image._id)
+                    })
+                } else {
+                    const deleteImage = await User.findByIdAndUpdate(_id, { "$pullAll": { "images": [imageId] } }).populate('images').exec((err, user) =>
+                        user.images.forEach((image) => image._id == imageId && image.remove())
+                    )
+                    // if (!deleteUser) return res.status(400).json({ success: false })
+
+                    // deleteUser.images.map(async (image) => {
+                    //     await Image.findByIdAndRemove(image._id)
+                    // })
+                }
 
                 res.status(200).json({ success: true, data: {} })
             } catch (error) {

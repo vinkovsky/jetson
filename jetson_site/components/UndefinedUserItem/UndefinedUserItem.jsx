@@ -10,11 +10,12 @@ const UndefinedUserItem = ({ group }) => {
     const [name, setName] = useState('')
     const [open, setOpen] = useState({ open: false, src: '' })
     const router = useRouter()
-    const handleInputChange = (e) => {
+
+    const inputChangeHandler = (e) => {
         setName(e.target.value);
     }
 
-    const handleCreateUser = async () => {
+    const createUserHandler = async () => {
         await fetch('/api/users', {
             method: 'POST',
             headers: {
@@ -45,13 +46,13 @@ const UndefinedUserItem = ({ group }) => {
                 style={{ width: 400 }}
                 placeholder="Undefined User"
                 value={name}
-                onChange={handleInputChange}
+                onChange={inputChangeHandler}
             />
             <ListItemText
                 primary={new Date(group[0].date).toLocaleString()}
             />
             <ListItemSecondaryAction>
-                <IconButton onClick={handleCreateUser}>
+                <IconButton onClick={createUserHandler}>
                     <Add />
                 </IconButton>
             </ListItemSecondaryAction>
