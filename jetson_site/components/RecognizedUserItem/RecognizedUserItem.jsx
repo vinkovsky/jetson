@@ -80,8 +80,9 @@ const RecognizedUserItem = ({ user }) => {
         router.push('/dashboard')
     }
 
-    const addNewImageHandler = () => {
-        setDropzone(true)
+    const addNewImageHandler = (files) => {
+        console.log('Files:', files);
+        setDropzone(false)
     }
 
     const avatar = user.images.find((image) => !image.croped)
@@ -139,7 +140,7 @@ const RecognizedUserItem = ({ user }) => {
                         ))}
                     </ListItem>
                     <ListItemSecondaryAction>
-                        <IconButton edge="end" onClick={addNewImageHandler}>
+                        <IconButton edge="end" onClick={() => setDropzone(true)}>
                             <Add />
                         </IconButton>
                     </ListItemSecondaryAction>
@@ -155,10 +156,7 @@ const RecognizedUserItem = ({ user }) => {
                 maxFileSize={5000000}
                 open={dropzone}
                 onClose={() => setDropzone(false)}
-                onSave={(files) => {
-                    console.log('Files:', files);
-                    setDropzone(false);
-                }}
+                onSave={addNewImageHandler}
                 showPreviews={false}
                 showPreviewsInDropzone
             />

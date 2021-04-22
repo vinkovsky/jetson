@@ -16,11 +16,13 @@
     "@material-ui/lab": "^4.0.0-alpha.57",
     "cloudinary": "^1.25.1",
     "clsx": "^1.1.1",
+    "formidable": "^1.2.2",
     "material-ui-dropzone": "^3.5.0",
     "mongoose": "^5.9.13",
     "next": "latest",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "streamifier": "^0.1.1",
     "swr": "0.5.5"
   },
   "license": "MIT"
