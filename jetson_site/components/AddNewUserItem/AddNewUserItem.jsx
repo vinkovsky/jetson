@@ -1,10 +1,13 @@
 import React, { useState } from 'react'
-import { Dialog, DialogContent, ListItem, ListItemIcon, ListItemText } from "@material-ui/core"
-import { Add } from "@material-ui/icons"
+import { IconButton, ListItem, ListItemIcon, ListItemText, TextField, Typography } from "@material-ui/core"
+import { Add, Close } from "@material-ui/icons"
+import { DropzoneDialogBase } from 'material-ui-dropzone'
 
 const AddNewUserItem = () => {
 
     const [open, setOpen] = useState(false)
+
+    const [fileObjects, setFileObjects] = useState([])
 
     return (
         <>
@@ -14,14 +17,43 @@ const AddNewUserItem = () => {
                 </ListItemIcon>
                 <ListItemText primary={'Add new user'} />
             </ListItem>
-            <Dialog open={open} fullWidth={true}
-                maxWidth={'sm'} onClose={() => setOpen(false)} >
-
-                <DialogContent>
-                    {'Create user here'}
-                </DialogContent>
-
-            </Dialog>
+            <DropzoneDialogBase
+                dialogTitle={
+                    <>
+                        <Typography component={'span'} variant="h6">Enter name</Typography>
+                        <TextField fullWidth />
+                        <IconButton
+                            style={{ right: '12px', top: '8px', position: 'absolute' }}
+                            onClick={() => setOpen(false)}>
+                            <Close />
+                        </IconButton>
+                    </>
+                }
+                acceptedFiles={['image/*']}
+                fileObjects={fileObjects}
+                cancelButtonText={"cancel"}
+                submitButtonText={"save"}
+                maxFileSize={5000000}
+                open={open}
+                onAdd={newFileObjs => {
+                    console.log('onAdd', newFileObjs)
+                    setFileObjects([].concat(fileObjects, newFileObjs))
+                }}
+                onDelete={(deleteFileObj, idx) => {
+                    console.log('onDelete', deleteFileObj, idx)
+                    const remainingFileObjs = fileObjects.filter((fileObject, i) => {
+                        return i !== idx;
+                    })
+                    setFileObjects(remainingFileObjs)
+                }}
+                onClose={() => setOpen(false)}
+                onSave={() => {
+                    console.log('onSave', fileObjects)
+                    setOpen(false);
+                }}
+                showPreviews={false}
+                showPreviewsInDropzone
+            />
         </>
     )
 }

@@ -3,6 +3,7 @@ import { Avatar, Badge, Collapse, Dialog, IconButton, InputBase, List, ListItem,
 import { ExpandLess, ExpandMore, Add, Delete, Edit, Save, Clear } from '@material-ui/icons'
 import { mutate } from 'swr'
 import { useRouter } from 'next/router'
+import { DropzoneDialog } from 'material-ui-dropzone'
 
 const contentType = 'application/json'
 
@@ -10,6 +11,8 @@ const RecognizedUserItem = ({ user }) => {
     const [modal, setModal] = useState(false)
 
     const [open, setOpen] = useState({ open: false, src: '' })
+
+    const [dropzone, setDropzone] = useState(false)
 
     const [edit, setEdit] = useState(false)
 
@@ -77,6 +80,10 @@ const RecognizedUserItem = ({ user }) => {
         router.push('/dashboard')
     }
 
+    const addNewImageHandler = () => {
+        setDropzone(true)
+    }
+
     const avatar = user.images.find((image) => !image.croped)
 
     return (
@@ -132,7 +139,7 @@ const RecognizedUserItem = ({ user }) => {
                         ))}
                     </ListItem>
                     <ListItemSecondaryAction>
-                        <IconButton edge="end">
+                        <IconButton edge="end" onClick={addNewImageHandler}>
                             <Add />
                         </IconButton>
                     </ListItemSecondaryAction>
@@ -141,6 +148,20 @@ const RecognizedUserItem = ({ user }) => {
             <Dialog open={open.open} onClose={() => setOpen((state) => ({ ...state, open: false }))}>
                 <img src={open.src} />
             </Dialog>
+            <DropzoneDialog
+                acceptedFiles={['image/*']}
+                cancelButtonText={"cancel"}
+                submitButtonText={"save"}
+                maxFileSize={5000000}
+                open={dropzone}
+                onClose={() => setDropzone(false)}
+                onSave={(files) => {
+                    console.log('Files:', files);
+                    setDropzone(false);
+                }}
+                showPreviews={false}
+                showPreviewsInDropzone
+            />
         </>
     )
 }
