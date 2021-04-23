@@ -13,12 +13,13 @@ const userController = async (req, res, next) => {
 
     if (name) {
         Image.findOne({ name }).populate("user").exec((err, image) => {
-            console.log(image.user.images)
-            const stats = new Stat({
-                name: image.user.name,
-                images: image.user.images[0]
-            })
-            stats.save(err => console.error(err))
+            if (image) {
+                const stats = new Stat({
+                    name: image.user.name,
+                    images: image.user.images[0]
+                })
+                stats.save(err => console.error(err))
+            }
 
             res.send(req.body)
         })
