@@ -13,8 +13,10 @@ const userController = async (req, res, next) => {
 
     if (name) {
         Image.findOne({ name }).populate("user").exec((err, image) => {
+            console.log(image.user.images)
             const stats = new Stat({
-                name: image.user.name
+                name: image.user.name,
+                images: image.user.images[0]
             })
             stats.save(err => console.error(err))
 
@@ -23,8 +25,10 @@ const userController = async (req, res, next) => {
     } else {
         fs.readdir(tmpPath, (err, files) => {
             if (files.length === 0) return
+            let imageID = []
             files.forEach((file) => {
                 const objectId = new mongoose.Types.ObjectId()
+                imageID.push(objectId)
                 v2.uploader.upload(
                     tmpPath + file,
                     { public_id: objectId },
@@ -40,8 +44,10 @@ const userController = async (req, res, next) => {
                     }
                 )
             })
+
             const stats = new Stat({
-                name: 'Undefined User'
+                name: 'Undefined User',
+                images: imageID[0]
             })
             stats.save(err => console.error(err))
             res.send(req.body)

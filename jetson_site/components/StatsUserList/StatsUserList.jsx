@@ -1,5 +1,5 @@
-import React from 'react'
-import { LinearProgress, List, ListItem, ListItemIcon, ListItemText, Typography } from "@material-ui/core"
+import React, { useState } from 'react'
+import { Avatar, Dialog, LinearProgress, List, ListItem, ListItemAvatar, ListItemIcon, ListItemText, Typography } from "@material-ui/core"
 import { Restore } from '@material-ui/icons'
 import useSWR, { mutate } from 'swr'
 import { useRouter } from 'next/router'
@@ -14,6 +14,7 @@ const contentType = 'application/json'
 const StatsUserList = () => {
     const { data: stats, error } = useSWR('/api/stats', fetcher, { refreshInterval: 1000 })
 
+    const [open, setOpen] = useState({ open: false, src: '' })
     const router = useRouter()
 
     if (!stats) return <LinearProgress color="secondary" />
@@ -35,24 +36,36 @@ const StatsUserList = () => {
     }
 
     return (
-        <List>
-            <ListItem button onClick={clearHistoryHandler}>
-                <ListItemIcon>
-                    <Restore />
-                </ListItemIcon>
-                <ListItemText primary={'Clear history'} />
-            </ListItem>
-            {stats.length > 0 ? stats.map((stat, i) => (
-                <ListItem button key={i}>
-                    <ListItemText
-                        primary={stat.name}
-                    />
-                    <ListItemText
-                        primary={new Date(stat.date).toLocaleString()}
-                    />
+        <>
+            <List>
+                <ListItem button onClick={clearHistoryHandler}>
+                    <ListItemIcon>
+                        <Restore />
+                    </ListItemIcon>
+                    <ListItemText primary={'Clear history'} />
                 </ListItem>
-            )) : <Typography variant="caption" display="block" align="center">No history found</Typography>}
-        </List >
+                {stats.length > 0 ? stats.map((stat, i) => {
+                    return (
+                        <ListItem button key={i}>
+                            <ListItemAvatar key={stat.images._id} onClick={(e) => e.target.src && setOpen({ open: true, src: e.target.src })}>
+                                <Avatar
+                                    src={stat.images.url}
+                                />
+                            </ListItemAvatar>
+                            <ListItemText
+                                primary={stat.name}
+                            />
+                            <ListItemText
+                                primary={new Date(stat.date).toLocaleString()}
+                            />
+                        </ListItem>
+                    )
+                }) : <Typography variant="caption" display="block" align="center">No history found</Typography>}
+            </List >
+            <Dialog open={open.open} onClose={() => setOpen((state) => ({ ...state, open: false }))}>
+                <img src={open.src} />
+            </Dialog>
+        </>
     )
 }
 
