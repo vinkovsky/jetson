@@ -2,13 +2,53 @@ import React, { useState } from 'react'
 import { IconButton, ListItem, ListItemIcon, ListItemText, TextField, Typography } from "@material-ui/core"
 import { Add, Close } from "@material-ui/icons"
 import { DropzoneDialogBase } from 'material-ui-dropzone'
+import { mutate } from 'swr'
+import { useRouter } from 'next/router'
+
+const contentType = 'application/json'
 
 const AddNewUserItem = () => {
 
     const [open, setOpen] = useState(false)
-
+    const [name, setName] = useState('')
     const [fileObjects, setFileObjects] = useState([])
+    const router = useRouter()
+    const createNewUserHandler = async () => {
 
+        const form = new FormData()
+        const files = fileObjects.map((item) => item.file)
+
+        files.forEach((file) => form.append("media", file));
+        console.log(files)
+        const data = await fetch('/api/upload', {
+            method: 'POST',
+            body: form
+        })
+
+        if (data.ok) {
+            await fetch('/api/users', {
+                method: 'PUT',
+                headers: {
+                    Accept: contentType,
+                    'Content-Type': contentType,
+                },
+                body: JSON.stringify({
+                    name,
+                    images: files
+                }),
+            })
+        }
+
+
+        mutate('/api/users')
+        router.push('/dashboard')
+        setOpen(false)
+    }
+
+    const inputChangeHandler = (e) => {
+        setName(e.target.value);
+    }
+    console.log(name)
     return (
         <>
             <ListItem button alignItems="center" onClick={() => setOpen(true)}>
@@ -21,7 +61,7 @@ const AddNewUserItem = () => {
                 dialogTitle={
                     <>
                         <Typography component={'span'} variant="h6">Enter name</Typography>
-                        <TextField fullWidth />
+                        <TextField fullWidth onChange={inputChangeHandler} />
                         <IconButton
                             style={{ right: '12px', top: '8px', position: 'absolute' }}
                             onClick={() => setOpen(false)}>
@@ -47,10 +87,7 @@ const AddNewUserItem = () => {
                     setFileObjects(remainingFileObjs)
                 }}
                 onClose={() => setOpen(false)}
-                onSave={() => {
-                    console.log('onSave', fileObjects)
-                    setOpen(false);
-                }}
+                onSave={createNewUserHandler}
                 showPreviews={false}
                 showPreviewsInDropzone
             />

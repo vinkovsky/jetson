@@ -10,7 +10,7 @@ const fetcher = (url) =>
         .then((json) => json.data)
 
 const RecognizedUserList = () => {
-    const { data: users, error } = useSWR('/api/users', fetcher)
+    const { data: users, error } = useSWR('/api/users', fetcher, { refreshInterval: 1000 })
 
     if (!users) return <LinearProgress color="secondary" />
 

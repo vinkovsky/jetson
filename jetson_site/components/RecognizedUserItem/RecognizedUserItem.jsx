@@ -80,8 +80,33 @@ const RecognizedUserItem = ({ user }) => {
         router.push('/dashboard')
     }
 
-    const addNewImageHandler = (files) => {
-        console.log('Files:', files);
+    const addNewImageHandler = async (files) => {
+        const form = new FormData();
+        console.log(files)
+        files.forEach((file) => form.append("media", file));
+
+        const data = await fetch('/api/upload', {
+            method: 'POST',
+            body: form
+        })
+
+        if (data.ok) {
+            await fetch('/api/users', {
+                method: 'PUT',
+                headers: {
+                    Accept: contentType,
+                    'Content-Type': contentType,
+                },
+                body: JSON.stringify({
+                    name: user.name,
+                    images: files
+                }),
+            })
+        }
+
+        console.log(data)
+        mutate('/api/users')
+        router.push('/dashboard')
         setDropzone(false)
     }
 
@@ -96,9 +121,9 @@ const RecognizedUserItem = ({ user }) => {
                         {edit ? <Save /> : <Edit />}
                     </IconButton>
                 </ListItemIcon>
-                <ListItemAvatar key={avatar._id} onClick={(e) => e.target.src && setOpen({ open: true, src: e.target.src })}>
+                <ListItemAvatar key={avatar?._id} onClick={(e) => e.target.src && setOpen({ open: true, src: e.target.src })}>
                     <Avatar
-                        src={avatar.url}
+                        src={avatar?.url}
                     />
                 </ListItemAvatar>
 
