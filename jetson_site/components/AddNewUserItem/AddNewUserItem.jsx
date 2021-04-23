@@ -34,7 +34,7 @@ const AddNewUserItem = () => {
                     'Content-Type': contentType,
                 },
                 body: JSON.stringify({
-                    name: name,
+                    name: name || `User - ${Math.floor(Math.random() * 100000)}`,
                     images: files
                 }),
             })
