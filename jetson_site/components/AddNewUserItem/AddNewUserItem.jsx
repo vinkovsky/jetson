@@ -13,13 +13,14 @@ const AddNewUserItem = () => {
     const [name, setName] = useState('')
     const [fileObjects, setFileObjects] = useState([])
     const router = useRouter()
+
     const createNewUserHandler = async () => {
 
         const form = new FormData()
         const files = fileObjects.map((item) => item.file)
 
         files.forEach((file) => form.append("media", file));
-        console.log(files)
+
         const data = await fetch('/api/upload', {
             method: 'POST',
             body: form
@@ -33,12 +34,11 @@ const AddNewUserItem = () => {
                     'Content-Type': contentType,
                 },
                 body: JSON.stringify({
-                    name,
+                    name: name || `User - ${Math.floor(Math.random() * 100000)}`,
                     images: files
                 }),
             })
         }
-
 
         mutate('/api/users')
         router.push('/dashboard')
@@ -48,7 +48,7 @@ const AddNewUserItem = () => {
     const inputChangeHandler = (e) => {
         setName(e.target.value);
     }
-    console.log(name)
+
     return (
         <>
             <ListItem button alignItems="center" onClick={() => setOpen(true)}>
